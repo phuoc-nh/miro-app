@@ -1,6 +1,6 @@
 import React from 'react'
 import {Plus} from 'lucide-react'
-import { OrganizationProfile, useOrganization } from '@clerk/nextjs'
+import { OrganizationProfile } from '@clerk/nextjs'
 import {
     Dialog,
     DialogContent,
