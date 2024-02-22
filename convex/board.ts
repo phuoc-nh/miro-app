@@ -38,3 +38,40 @@ export const create = mutation({
         return  board
     }
 })
+
+export const remove = mutation({
+    args: {id: v.id('boards')},
+    handler: async (ctx, args) => {
+        const identity = ctx.auth.getUserIdentity()
+        if (!identity) {
+            throw new Error('Unauthorized')
+        }
+
+        await ctx.db.delete(args.id)
+    } 
+})
+
+export const update =  mutation({
+    args: {id: v.id('boards'), title: v.string()},
+    async handler(ctx, args) {
+        const identity = ctx.auth.getUserIdentity()
+        if (!identity) {
+            throw new Error('Unauthorized')
+        }
+
+        const title = args.title.trim();
+        const id = args.id
+        if (title.length > 60) {
+            throw new Error('Title can not be longer than 60 chars')
+        }
+
+        const board = await ctx.db.patch(
+            id,
+            {
+                title
+            }
+        )
+
+        return board
+    },
+})
