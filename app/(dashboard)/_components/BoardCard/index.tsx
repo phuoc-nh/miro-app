@@ -8,6 +8,8 @@ import { useAuth } from "@clerk/nextjs";
 import { Footer } from "./Footer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Actions } from "@/components/Actions";
+import { useApiMutation } from "@/hooks/use-api-mutation";
+import { api } from "@/convex/_generated/api";
 
 interface BoardCardProps {
     id: string;
@@ -22,12 +24,22 @@ interface BoardCardProps {
 
 export const BoardCard = (props: BoardCardProps) => {
     const {id, title, authorId, authorName, createdAt, imageUrl, orgId, isFavorite} = props
-    console.log('imageUrl', imageUrl)
     const {userId} = useAuth()
     const authLabel = userId === authorId ? 'You' : authorName
     const createdAtLabel = formatDistanceToNow(createdAt, {
         addSuffix: true,
     })
+
+    const {mutate: onFavorite } = useApiMutation(api.board.favorite)
+    const {mutate: onUnFavorite } = useApiMutation(api.board.unfavorite)
+
+    const toggleFavorite = () => {
+        if (isFavorite) {
+            onUnFavorite({id, orgId})
+        } else {
+            onFavorite({id, orgId})
+        }
+    }
 
     return (
         // <Link href={`/board/${id}`}>
@@ -59,7 +71,7 @@ export const BoardCard = (props: BoardCardProps) => {
                     title={title}
                     authorLabel={authLabel}
                     createdAtLabel={createdAtLabel}
-                    onClick={() => {}}
+                    onClick={toggleFavorite}
                     disabled={false}
                     isFavorite={isFavorite} />
             </div>
