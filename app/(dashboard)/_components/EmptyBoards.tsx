@@ -8,19 +8,23 @@ import { useMutation } from 'convex/react'
 import { useOrganization } from '@clerk/nextjs'
 import { useApiMutation } from '@/hooks/use-api-mutation'
 import { toast } from 'sonner'
+import { useRouter } from 'next/navigation'
 
 export default function EmptyBoards() {
     const {organization} = useOrganization()
     const {mutate, pending} = useApiMutation(api.board.create)
+    const router = useRouter();
     const onClick = () => {
         if (!organization) return
 
         mutate({
             title: 'Untitled',
             orgId: organization.id
-        }).then(() => {
+        }).then((id) => {
             toast.success('Board created!')
             // TODO: 
+            router.push(`/board/${id}`)
+            router
         }).catch(() => {
             toast.error('Failed to create board')
         })
