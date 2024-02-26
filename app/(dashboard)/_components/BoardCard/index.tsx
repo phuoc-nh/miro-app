@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Actions } from "@/components/Actions";
 import { useApiMutation } from "@/hooks/use-api-mutation";
 import { api } from "@/convex/_generated/api";
+import { useRouter } from "next/navigation";
 
 interface BoardCardProps {
     id: string;
@@ -41,11 +42,15 @@ export const BoardCard = (props: BoardCardProps) => {
         }
     }
 
+    const router = useRouter()
+
+
+
     return (
         // <Link href={`/board/${id}`}>
         
-            <div className="group aspect-[100/127] border rounded-lg flex flex-col justify-between overflow-hidden">
-                <div className="relative flex-1 bg-amber-50">
+            <div className="group aspect-[100/127] border rounded-lg flex flex-col justify-between overflow-hidden hover:cursor-pointer">
+                <div className="relative flex-1 bg-amber-50" onClick={() => router.push(`/board/${id}`)}>
                     <Image 
                         src={imageUrl}
                         alt={title}
