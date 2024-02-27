@@ -8,7 +8,13 @@ interface CanvasProps {
     boardId: string
 }
 
+import { useSelf } from "@/liveblocks.config"
+
+
 export const Canvas = ({boardId}: CanvasProps) => {
+    const info = useSelf((me) => me.info)
+    console.log(info)
+
     return (
         <main className="h-full w-full relative bg-neutral-100 touch-none">
             <Info></Info>
