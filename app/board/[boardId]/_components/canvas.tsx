@@ -1,15 +1,17 @@
 'use client'
 
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import { Info } from "./Info"
 import { Participants } from "./Participants"
 import { Toolbar } from "./Toolbar"
-import { CanvasMode, CanvasState } from "@/types/canvas"
+import { Camera, CanvasMode, CanvasState } from "@/types/canvas"
 interface CanvasProps {
     boardId: string
 }
 
-import { useCanRedo, useCanUndo, useHistory, useSelf } from "@/liveblocks.config"
+import { useCanRedo, useCanUndo, useHistory, useMutation, useSelf } from "@/liveblocks.config"
+import CursorPresence from "./CursorPresence"
+import { pointerEventToCanvasPoint } from "@/lib/utils"
 
 
 export const Canvas = ({boardId}: CanvasProps) => {
@@ -17,10 +19,29 @@ export const Canvas = ({boardId}: CanvasProps) => {
     const [canvasState, setCanvasState] = useState<CanvasState>({
         mode: CanvasMode.None
     })
-
+    const [camera, setCamera] = useState<Camera>({x: 0, y: 0})
     const history = useHistory()
     const canUndo = useCanUndo()
     const canRedo = useCanRedo()
+    const onWheel = useCallback((e: React.WheelEvent) => {
+
+        setCamera((prev) => {
+            return {
+                x: prev.x - e.deltaX,
+                y: prev.y - e.deltaY
+            }
+        })
+    }, [])
+
+    const onPointerMove = useMutation(({setMyPresence}, e: React.PointerEvent)=> {
+        e.preventDefault()
+        const current = pointerEventToCanvasPoint(e, camera)
+        setMyPresence({cursor: current})
+    },[])
+
+    const onPointerLeave = useMutation(({setMyPresence}) => {
+        setMyPresence({cursor: null})
+    }, [])
     return (
         <main className="h-full w-full relative bg-neutral-100 touch-none">
             <Info boardId={boardId}></Info>
@@ -33,6 +54,16 @@ export const Canvas = ({boardId}: CanvasProps) => {
                 undo={history.undo}
                 redo={history.redo}
             ></Toolbar>
+            <svg
+                className="h-[100vh] w-[100vw]"
+                onWheel={onWheel}
+                onPointerMove={onPointerMove}
+                onPointerLeave={onPointerLeave}
+            >
+                <g>
+                    <CursorPresence />
+                </g>
+            </svg>
         </main>
     )
 }
