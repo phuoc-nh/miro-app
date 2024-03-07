@@ -126,3 +126,4 @@ export enum Side {
     Right = 4
 }
 
+export type Layer = RectangleLayer | EllipseLayer | PathLayer | TextLayer | NoteLayer
